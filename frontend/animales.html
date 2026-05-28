@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>🐯 Animales - Zoológico El Sabinal</title>
+
+  <link rel="stylesheet" href="/css/animales.css">
+</head>
+<body>
+  <main class="animales-page">
+    <section class="animales-hero">
+      <div class="hero-overlay"></div>
+
+      <div class="hero-content">
+        <span class="kicker">Explora la vida silvestre</span>
+        <h1>🐯 Animales del Zoológico El Sabinal</h1>
+        <p>
+          Conoce algunas de las especies que forman parte del zoológico.
+          Descubre su hábitat, alimentación y características principales.
+        </p>
+
+        <div class="hero-actions">
+          <a href="/" class="btn-main">🎟️ Reservar boletos</a>
+          <a href="#listaAnimalesPublicos" class="btn-secondary">🌿 Ver catálogo</a>
+        </div>
+      </div>
+    </section>
+
+    <section class="info-strip">
+      <div>
+        <strong>📍 Ubicación</strong>
+        <span>El Sabinal, La Trinitaria</span>
+      </div>
+
+      <div>
+        <strong>🕐 Horario</strong>
+        <span>Lun-Dom: 9:00 AM - 5:00 PM</span>
+      </div>
+
+      <div>
+        <strong>📞 Informes</strong>
+        <span>963 331 5111</span>
+      </div>
+    </section>
+
+    <section class="animales-section">
+      <div class="section-head">
+        <div>
+          <h2>🌿 Catálogo de animales</h2>
+          <p>Estos animales están registrados actualmente en el zoológico.</p>
+        </div>
+
+        <a href="/" class="back-link">← Volver a reservaciones</a>
+      </div>
+
+      <div id="msgAnimalesPublicos" class="mensaje-publico"></div>
+
+      <div id="listaAnimalesPublicos" class="animales-grid">
+        <div class="loading-card">Cargando animales...</div>
+      </div>
+    </section>
+  </main>
+
+  <script src="/js/animales.js"></script>
+</body>
+</html>
