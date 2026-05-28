@@ -1,6 +1,7 @@
 // ============================================
 // 🔧 FORZAR IPv4
 // ============================================
+const VERCEL_BASE = 'https://zoologico-trinitaria-o7psz689z-solano204s-projects.vercel.app';
 
 require('dotenv').config();
 const dns = require('dns');
@@ -55,7 +56,11 @@ if (!fs.existsSync(QR_DIR)) {
 }
 
 app.use(cors({
-    origin: true,
+    origin: [
+        'https://zoologico-trinitaria-o7psz689z-solano204s-projects.vercel.app',
+        'http://localhost:3000',
+        'http://localhost:5500'
+    ],
     credentials: true
 }));
 app.use(express.json({ limit: '2mb' }));
@@ -1012,7 +1017,7 @@ function sanitizarNextUrl(valor) {
 app.get('/panel-login', (req, res) => {
     aplicarNoCache(res);
 
-    const nextUrl = sanitizarNextUrl(req.query.next || '/admin.html');
+    const nextUrl = sanitizarNextUrl(req.query.next || `${VERCEL_BASE}/admin.html`);
     const hayError = Boolean(req.query.error);
     const logout = Boolean(req.query.logout);
 
@@ -1352,12 +1357,38 @@ app.post('/panel-login', (req, res) => {
     const session = crearPanelSession(username);
     const cookieSecure = process.env.NODE_ENV === 'production' ? '; Secure' : '';
 
+  res.setHeader(
+  'Set-Cookie',
+  `panel_session=${session.token}; HttpOnly; SameSite=None; Secure; Path=/; Max-Age=${PANEL_SESSION_HOURS * 60 * 60}`
+);
+    return res.redirect(nextUrl);
+});
+
+app.post('/panel-login', (req, res) => {
+    aplicarNoCache(res);
+
+    const username = String(req.body.username || '').trim();
+    const password = String(req.body.password || '');
+    const nextUrl = sanitizarNextUrl(req.body.next || '/admin.html');
+
+    if (username !== PANEL_USER || password !== PANEL_PASS) {
+        return res.redirect(`/panel-login?error=1&next=${encodeURIComponent(nextUrl)}`);
+    }
+
+    const session = crearPanelSession(username);
+
     res.setHeader(
         'Set-Cookie',
-        `panel_session=${session.token}; HttpOnly; SameSite=Lax; Path=/; Max-Age=${PANEL_SESSION_HOURS * 60 * 60}${cookieSecure}`
+        `panel_session=${session.token}; HttpOnly; SameSite=None; Secure; Path=/; Max-Age=${PANEL_SESSION_HOURS * 60 * 60}`
     );
 
-    return res.redirect(nextUrl);
+    // Si nextUrl es una URL completa (http/https), redirige directo
+    // Si es una ruta relativa como /admin.html, la prepende con Vercel
+    const redirectTo = nextUrl.startsWith('http')
+        ? nextUrl
+        : `${VERCEL_BASE}${nextUrl}`;
+
+    return res.redirect(redirectTo);
 });
 
 app.get('/panel-logout', (req, res) => {
@@ -1370,11 +1401,9 @@ app.get('/panel-logout', (req, res) => {
         panelSessions.delete(token);
     }
 
-    const cookieSecure = process.env.NODE_ENV === 'production' ? '; Secure' : '';
-
     res.setHeader(
         'Set-Cookie',
-        `panel_session=; HttpOnly; SameSite=Lax; Path=/; Max-Age=0${cookieSecure}`
+        `panel_session=; HttpOnly; SameSite=None; Secure; Path=/; Max-Age=0`
     );
 
     res.setHeader('Clear-Site-Data', '"cache"');
