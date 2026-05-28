@@ -1,4 +1,4 @@
-       const API_BASE = '';
+       const API_BASE = 'https://zoologico-trinitaria-production.up.railway.app';
       let html5QrCode = null;
 let camaraActiva = false;
 let procesandoEscaneo = false;

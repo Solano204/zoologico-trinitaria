@@ -1,4 +1,4 @@
-const API_BASE = '';
+const API_BASE = 'https://zoologico-trinitaria-production.up.railway.app';
 
 function escapeHTML(valor) {
   return String(valor ?? '')
