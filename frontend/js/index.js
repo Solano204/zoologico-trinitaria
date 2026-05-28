@@ -1,5 +1,6 @@
 
-        const API_BASE = 'https://zoologico-trinitaria-production.up.railway.app';
+     const API_BASE = 'https://zoologico-trinitaria-production.up.railway.app';
+
         let categorias = [];
         let promocionesWeb = [];
 

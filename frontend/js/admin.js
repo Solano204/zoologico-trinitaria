@@ -2381,7 +2381,7 @@ async function eliminarAnimal(id) {
 async function verificarSesionPanel() {
   try {
     const res = await fetch(`${API_BASE}/api/panel-me`, {
-      credentials: 'same-origin'
+      credentials: 'include'
     });
 
     if (!res.ok) {
