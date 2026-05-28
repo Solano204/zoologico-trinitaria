@@ -1,0 +1,984 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>🦁 Panel Admin / Taquillero - Zoológico El Sabinal</title>
+  <link rel="stylesheet" href="/css/admin.css">
+</head>
+<body>
+  <div class="layout">
+    <aside class="sidebar">
+      <div class="brand">
+        <h1>🦁 Panel Sabinal</h1>
+        <p>Admin / Taquillero</p>
+      </div>
+
+      <nav class="menu">
+      <button class="menu-btn active" data-panel="dashboard">📊 Dashboard</button>
+<button class="menu-btn" data-panel="taquilla">🏷️ Venta en taquilla</button>
+<button class="menu-btn" data-panel="ventas">🎟️ Ventas del día</button>
+        <button class="menu-btn" data-panel="accesos">🚪 Historial de accesos</button>
+        <button class="menu-btn" data-panel="buscar">🔎 Buscar por folio</button>
+        <button class="menu-btn" data-panel="corte">💰 Corte básico</button>
+        <button class="menu-btn" data-panel="bi">📈 BI y gráficas</button>
+<button class="menu-btn" data-panel="promociones">🎯 Promociones web</button>
+<button class="menu-btn" data-panel="animales">🐯 Animales</button>
+       <a href="/lector.html">📷 Ir al lector QR</a>
+<a href="/">🛒 Ir a la venta pública</a>
+<a href="/panel-logout" class="logout-link">🚪 Cerrar sesión</a>
+      </nav>
+
+<div class="sidebar-note">
+  Este panel es operativo.  
+  Permite consultar ventas, accesos, corte, búsqueda por folio, venta en taquilla e inteligencia de negocios.
+  El acceso está protegido mediante inicio de sesión del panel.
+</div>
+
+</aside>
+
+<main class="main">
+     <section class="topbar">
+  <div class="topbar-row">
+    <div>
+      <h2>Panel de control del Zoológico El Sabinal</h2>
+      <p>Monitoreo de ventas, accesos, búsqueda por folio y corte diario.</p>
+    </div>
+
+    <div class="user-chip">
+      <small><span class="dot"></span>Sesión activa</small>
+      <strong id="panelUsername">Cargando usuario...</strong>
+    </div>
+  </div>
+</section>
+<section class="panel active dashboard-panel" id="panel-dashboard">
+  <div class="dashboard-head">
+    <div>
+      <h3>📊 Dashboard general</h3>
+      <p>Resumen operativo del día, ventas recientes, canales y alertas rápidas.</p>
+    </div>
+
+    <div class="dashboard-date-chip">
+      <small>Fecha de operación</small>
+      <strong id="dashboardFechaHoy">--/--/----</strong>
+    </div>
+  </div>
+
+  <div class="cards dashboard-cards">
+    <div class="card dash-card">
+      <div class="dash-icon">🧾</div>
+      <h4>Operaciones hoy</h4>
+      <div class="value" id="cardVentasHoy">0</div>
+      <small>Reservaciones y ventas registradas</small>
+    </div>
+
+    <div class="card dash-card">
+      <div class="dash-icon">💵</div>
+      <h4>Ingresos cobrados hoy</h4>
+      <div class="value" id="cardIngresosHoy">$0</div>
+      <small>Pagos confirmados en taquilla</small>
+    </div>
+
+    <div class="card dash-card">
+      <div class="dash-icon">🚪</div>
+      <h4>Accesos aceptados</h4>
+      <div class="value" id="cardAccesosAceptados">0</div>
+      <small>Entradas válidas registradas</small>
+    </div>
+
+    <div class="card dash-card">
+      <div class="dash-icon">⏳</div>
+      <h4>Reservaciones pendientes</h4>
+      <div class="value" id="cardPendientes">0</div>
+      <small>QR web pendientes de pago o ingreso</small>
+    </div>
+
+    <div class="card dash-card">
+      <div class="dash-icon">🏆</div>
+      <h4>Más vendido</h4>
+      <div class="value" id="cardMasVendido">---</div>
+      <small>Categoría más solicitada</small>
+    </div>
+  </div>
+
+  <div class="dashboard-grid">
+    <div class="dashboard-box dashboard-chart-box">
+      <div class="dash-box-title">
+        <div>
+          <h4>🌐 Canales de venta</h4>
+          <p>Comparación rápida entre web y taquilla.</p>
+        </div>
+      </div>
+
+      <div class="mini-chart-wrap">
+        <canvas id="chartDashboardCanales"></canvas>
+      </div>
+
+      <div class="channel-summary">
+        <div>
+          <span>🌐 Web</span>
+          <strong id="dashWeb">0</strong>
+        </div>
+        <div>
+          <span>💵 Taquilla</span>
+          <strong id="dashTaquilla">0</strong>
+        </div>
+      </div>
+    </div>
+
+    <div class="dashboard-box dashboard-alerts">
+      <div class="dash-box-title">
+        <div>
+          <h4>⚡ Estado rápido</h4>
+          <p>Datos clave para operar el día.</p>
+        </div>
+      </div>
+
+      <div class="alert-list">
+        <div class="dash-alert warn">
+          <span>⏳</span>
+          <div>
+            <strong id="dashPendientesTexto">0 pendientes</strong>
+            <small>Reservaciones web por confirmar.</small>
+          </div>
+        </div>
+
+        <div class="dash-alert ok">
+          <span>🎟️</span>
+          <div>
+            <strong id="dashPersonasTexto">0 personas</strong>
+            <small>Visitantes esperados/registrados hoy.</small>
+          </div>
+        </div>
+
+        <div class="dash-alert info">
+          <span>🎯</span>
+          <div>
+            <strong id="dashPromoTexto">Sin promoción activa</strong>
+            <small>Promoción web vigente para hoy.</small>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="dashboard-box dashboard-recent">
+      <div class="dash-box-title">
+        <div>
+          <h4>🕘 Actividad reciente</h4>
+          <p>Últimas operaciones registradas.</p>
+        </div>
+
+        <button class="btn btn-outline btn-sm" onclick="cambiarPanel('ventas')">
+          Ver ventas
+        </button>
+      </div>
+
+      <div class="recent-list" id="dashboardRecientes">
+        <div class="recent-empty">Cargando actividad reciente...</div>
+      </div>
+    </div>
+
+    <div class="dashboard-box dashboard-actions">
+      <div class="dash-box-title">
+        <div>
+          <h4>🚀 Accesos rápidos</h4>
+          <p>Atajos principales del panel.</p>
+        </div>
+      </div>
+
+      <div class="quick-actions">
+        <button class="quick-btn" onclick="cambiarPanel('taquilla')">
+          <span>🏷️</span>
+          <strong>Venta en taquilla</strong>
+        </button>
+
+        <button class="quick-btn" onclick="cambiarPanel('buscar')">
+          <span>🔎</span>
+          <strong>Buscar folio</strong>
+        </button>
+
+        <button class="quick-btn" onclick="cambiarPanel('corte')">
+          <span>💰</span>
+          <strong>Corte del día</strong>
+        </button>
+
+        <a class="quick-btn" href="/lector.html">
+          <span>📷</span>
+          <strong>Lector QR</strong>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <div class="tiny-note">Actualización automática cada 30 segundos.</div>
+  <div id="msgDashboard" class="message"></div>
+</section>
+
+   <section class="panel" id="panel-taquilla">
+  <div class="taquilla-hero">
+    <div>
+      <span class="module-kicker">Caja / Taquilla</span>
+      <h3>🏷️ Venta en taquilla</h3>
+      <p>Registra ventas presenciales, cobra en efectivo y genera el ticket de compra para el visitante.</p>
+    </div>
+
+    <div class="taquilla-status">
+      <small>Estado de caja</small>
+      <strong>🟢 Operativa</strong>
+    </div>
+  </div>
+
+  <div class="taquilla-alert">
+    <strong>ℹ️ Nota:</strong> Menores de 5 años entran gratis y no requieren boleto.  
+    Estudiantes deben presentar credencial vigente.
+  </div>
+
+  <div class="taquilla-layout pro">
+    <div class="taquilla-card venta-form-card">
+      <div class="section-title-row">
+        <div>
+          <h4>Datos del visitante</h4>
+          <p>Información básica para identificar el ticket.</p>
+        </div>
+        <span class="pill-soft">Pago en efectivo</span>
+      </div>
+
+      <div class="taquilla-grid">
+        <div class="field">
+          <label for="tkNombre">Nombre del cliente</label>
+          <input type="text" id="tkNombre" placeholder="Ej. Juan Pérez">
+        </div>
+
+        <div class="field">
+          <label for="tkTelefono">Teléfono</label>
+          <input type="text" id="tkTelefono" placeholder="Ej. 9631234567">
+        </div>
+
+        <div class="field">
+          <label for="tkEmail">Correo opcional</label>
+          <input type="email" id="tkEmail" placeholder="Ej. cliente@gmail.com">
+        </div>
+
+        <div class="field">
+          <label for="tkFecha">Fecha de visita</label>
+          <input type="date" id="tkFecha">
+        </div>
+
+        <div class="field">
+          <label for="tkMetodoPago">Método de pago</label>
+          <select id="tkMetodoPago">
+            <option value="efectivo" selected>Efectivo</option>
+          </select>
+          <small class="field-help">La venta en taquilla se registra únicamente en efectivo.</small>
+        </div>
+      </div>
+
+      <div class="taquilla-actions">
+        <button class="btn btn-secondary" id="btnTkHoy">Usar fecha de hoy</button>
+        <button class="btn btn-outline" id="btnTkLimpiar">Limpiar venta</button>
+      </div>
+
+      <div id="msgTaquilla" class="message"></div>
+    </div>
+
+    <div class="taquilla-card boletos-card">
+      <div class="section-title-row">
+        <div>
+          <h4>Boletos disponibles</h4>
+          <p>Selecciona las cantidades con los botones de control.</p>
+        </div>
+      </div>
+
+      <div id="tkCategoriasWrap" class="boleto-grid">
+        Cargando categorías...
+      </div>
+    </div>
+
+    <div class="taquilla-card resumen-caja">
+      <div class="section-title-row">
+        <div>
+          <h4>Resumen de cobro</h4>
+          <p>Revisa el total antes de generar el ticket.</p>
+        </div>
+      </div>
+
+      <div class="resumen-taquilla resumen-pro">
+        <div class="resumen-item">
+          <h5>Total personas</h5>
+          <div class="v" id="tkTotalPersonas">0</div>
+        </div>
+
+        <div class="resumen-item total-destacado">
+          <h5>Total a cobrar</h5>
+          <div class="v" id="tkTotalMonto">$0.00</div>
+        </div>
+      </div>
+
+      <button class="btn btn-primary btn-cobrar" id="btnTkVender">
+        💵 Cobrar e imprimir ticket
+      </button>
+
+      <p class="mini-help">
+        Al generar la venta, el sistema la registrará como pagada y mostrará el ticket.
+      </p>
+    </div>
+  </div>
+
+  <div class="resultado-taquilla" id="tkResultado">
+    <h4 style="margin-top:0;">✅ Ticket de compra generado</h4>
+    <div id="tkResumenVenta"></div>
+
+    <div class="qr-wrap" style="display:none;">
+      <img id="tkQrImg" src="" alt="QR interno de la venta">
+    </div>
+
+    <div class="actions-row">
+      <button class="btn btn-secondary" id="btnTkImprimir">Imprimir ticket</button>
+      <button class="btn btn-secondary" id="btnTkVerDetalle">Ver en buscar por folio</button>
+      <button class="btn btn-primary" id="btnTkDescargarQR" style="display:none;">Descargar QR interno</button>
+    </div>
+  </div>
+</section>
+
+      <section class="panel" id="panel-ventas">
+        <h3>🎟️ Ventas del día</h3>
+
+        <div class="filters">
+          <div class="field">
+            <label for="fechaVentas">Fecha</label>
+            <input type="date" id="fechaVentas">
+          </div>
+          <div class="field">
+            <label for="estadoAccesoVentas">Estado de acceso</label>
+            <select id="estadoAccesoVentas">
+              <option value="">Todos</option>
+              <option value="pendiente">Pendiente</option>
+              <option value="usado">Usado</option>
+              <option value="rechazado">Rechazado</option>
+              <option value="cancelado">Cancelado</option>
+            </select>
+          </div>
+          <button class="btn btn-primary" id="btnVentas">Consultar</button>
+          <button class="btn btn-secondary" id="btnVentasHoy">Hoy</button>
+          <button class="btn btn-secondary" id="btnExportarVentas">Exportar CSV</button>
+        </div>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Folio</th>
+                <th>Cliente</th>
+                <th>Email</th>
+                <th>Fecha visita</th>
+                <th>Personas</th>
+                <th>Total</th>
+                <th>Pago</th>
+                <th>Acceso</th>
+                <th>Canal</th>
+                <th>Escaneos</th>
+                <th>Acciones</th>
+              </tr>
+            </thead>
+            <tbody id="tbodyVentas">
+              <tr><td colspan="11">Cargando ventas...</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div id="msgVentas" class="message"></div>
+      </section>
+
+      <section class="panel" id="panel-accesos">
+        <h3>🚪 Historial de accesos</h3>
+
+        <div class="filters">
+          <div class="field">
+            <label for="fechaAccesos">Fecha</label>
+            <input type="date" id="fechaAccesos">
+          </div>
+          <div class="field">
+            <label for="resultadoAcceso">Resultado</label>
+            <select id="resultadoAcceso">
+              <option value="">Todos</option>
+              <option value="aceptado">Aceptado</option>
+              <option value="rechazado">Rechazado</option>
+            </select>
+          </div>
+          <button class="btn btn-primary" id="btnAccesos">Consultar</button>
+          <button class="btn btn-secondary" id="btnAccesosHoy">Hoy</button>
+          <button class="btn btn-secondary" id="btnExportarAccesos">Exportar CSV</button>
+        </div>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Fecha acceso</th>
+                <th>Folio</th>
+                <th>Cliente</th>
+                <th>Email</th>
+                <th>Resultado</th>
+                <th>Dispositivo</th>
+                <th>Motivo rechazo</th>
+              </tr>
+            </thead>
+            <tbody id="tbodyAccesos">
+              <tr><td colspan="7">Cargando accesos...</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div id="msgAccesos" class="message"></div>
+      </section>
+
+      <section class="panel" id="panel-buscar">
+  <h3>🔎 Buscar venta por folio</h3>
+
+  <div class="search-box">
+    <div class="filters.single">
+      <div class="field">
+        <label for="folioBuscar">Folio</label>
+        <input type="text" id="folioBuscar" placeholder="Ej. ZB-20260401-AAAAAA">
+      </div>
+      <button class="btn btn-primary" id="btnBuscarFolio">Buscar</button>
+      <button class="btn btn-secondary" id="btnLimpiarBusqueda">Limpiar</button>
+    </div>
+
+    <div id="msgBuscar" class="message"></div>
+
+    <div class="detail-card" id="detalleVenta">
+      <h3 style="margin-top:0;">📋 Detalle de la venta</h3>
+
+      <div class="detail-grid" id="detalleGrid"></div>
+
+<div class="actions-row">
+  <button class="btn btn-primary" id="btnRegistrarEntrada">Registrar entrada manual</button>
+  <button class="btn btn-primary" id="btnDescargarQRDetalle">Descargar QR</button>
+  <button class="btn btn-secondary" id="btnReimprimirDetalle">Reimprimir ticket</button>
+  <button class="btn btn-primary" id="btnConfirmarPago">Confirmar pago</button>
+  <button class="btn btn-danger" id="btnCancelarVenta">Cancelar venta</button>
+</div>
+
+<div class="detail-list">
+        <strong>🎟️ Detalle de compra</strong>
+        <ul id="detalleLista"></ul>
+      </div>
+
+      <div class="detail-list">
+        <strong>🚪 Accesos registrados</strong>
+        <ul id="accesosLista"></ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+      <section class="panel" id="panel-corte">
+  <div class="bi-hero">
+    <div>
+      <span class="module-kicker">Caja / Corte diario</span>
+      <h3>💰 Corte básico</h3>
+      <p>
+        Consulta las ventas cobradas del día, revisa el detalle por cliente y genera un reporte listo para imprimir o guardar en PDF.
+      </p>
+    </div>
+
+    <div class="bi-status">
+      <small>Tipo de pago</small>
+      <strong>💵 Efectivo</strong>
+    </div>
+  </div>
+
+  <div class="taquilla-alert">
+    <strong>ℹ️ Nota:</strong> el corte se genera por fecha de venta/cobro. 
+    Las reservaciones web aparecen cuando ya fueron confirmadas como pagadas en taquilla.
+  </div>
+
+  <div class="filters corte-filters">
+    <div class="field">
+      <label for="fechaCorte">Fecha de corte</label>
+      <input type="date" id="fechaCorte">
+    </div>
+
+    <button class="btn btn-primary" id="btnCorte">Consultar</button>
+    <button class="btn btn-secondary" id="btnCorteHoy">Hoy</button>
+    <button class="btn btn-secondary" id="btnExportarCorte">Exportar CSV</button>
+    <button class="btn btn-outline" id="btnImprimirCorte">Imprimir / guardar PDF</button>
+  </div>
+
+  <div class="cut-grid corte-grid-pro">
+    <div class="cut-item">
+      <h4>Total operaciones</h4>
+      <div class="n" id="corteOperaciones">0</div>
+      <small>Ventas cobradas</small>
+    </div>
+
+    <div class="cut-item total-corte">
+      <h4>Monto total</h4>
+      <div class="n" id="corteMonto">$0.00</div>
+      <small>Total del corte</small>
+    </div>
+
+    <div class="cut-item">
+      <h4>Efectivo</h4>
+      <div class="n" id="corteEfectivo">$0.00</div>
+      <small>Cobrado en caja</small>
+    </div>
+
+    <div class="cut-item">
+      <h4>Personas / boletos</h4>
+      <div class="n" id="cortePersonas">0</div>
+      <small>Total de visitantes</small>
+    </div>
+
+    <div class="cut-item">
+      <h4>Ventas web cobradas</h4>
+      <div class="n" id="corteVentasWeb">0</div>
+      <small>Reservaciones confirmadas</small>
+    </div>
+
+    <div class="cut-item">
+      <h4>Ventas en taquilla</h4>
+      <div class="n" id="corteVentasTaquilla">0</div>
+      <small>Ventas presenciales</small>
+    </div>
+
+    <div class="cut-item">
+      <h4>Accesos aceptados</h4>
+      <div class="n" id="corteAceptados">0</div>
+      <small>Entradas válidas</small>
+    </div>
+
+    <div class="cut-item">
+      <h4>Accesos rechazados</h4>
+      <div class="n" id="corteRechazados">0</div>
+      <small>Intentos no válidos</small>
+    </div>
+  </div>
+
+  <div class="corte-detalle-card">
+    <div class="section-title-row">
+      <div>
+        <h4>📋 Detalle de ventas del corte</h4>
+        <p>Listado de operaciones cobradas durante la fecha seleccionada.</p>
+      </div>
+      <span class="pill-soft" id="corteFechaLabel">Sin fecha</span>
+    </div>
+
+    <div class="table-wrap corte-table-wrap">
+      <table class="corte-table">
+        <thead>
+          <tr>
+            <th>Hora</th>
+            <th>Folio</th>
+            <th>Cliente</th>
+            <th>Canal</th>
+            <th>Personas</th>
+            <th>Detalle de boletos</th>
+            <th>Total</th>
+            <th>Pago</th>
+          </tr>
+        </thead>
+        <tbody id="tbodyCorteDetalle">
+          <tr>
+            <td colspan="8">Consulta una fecha para cargar el corte.</td>
+          </tr>
+        </tbody>
+        <tfoot>
+          <tr>
+            <td colspan="6" style="text-align:right;">Total del corte:</td>
+            <td id="corteTotalDetalle">$0.00</td>
+            <td>Pagado</td>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+  </div>
+
+  <div id="msgCorte" class="message"></div>
+</section>
+
+      <section class="panel" id="panel-bi">
+  <div class="bi-hero">
+    <div>
+      <span class="module-kicker">Inteligencia de negocios</span>
+      <h3>📈 BI y gráficas del Zoológico El Sabinal</h3>
+      <p>
+        Analiza reservaciones web, ventas en taquilla, categorías más solicitadas,
+        ingresos, días con mayor demanda y recomendaciones para mejorar la operación.
+      </p>
+    </div>
+
+    <div class="bi-status">
+      <small>Modo de análisis</small>
+      <strong>📊 Operativo</strong>
+    </div>
+  </div>
+
+  <div class="bi-header">
+    <strong>Objetivo:</strong>
+    convertir los datos de ventas, reservaciones y accesos en información útil para la toma de decisiones del zoológico.
+  </div>
+
+  <div class="bi-filters-pro">
+    <div class="field">
+      <label for="fechaInicioBI">Fecha inicial</label>
+      <input type="date" id="fechaInicioBI">
+    </div>
+
+    <div class="field">
+      <label for="fechaFinBI">Fecha final</label>
+      <input type="date" id="fechaFinBI">
+    </div>
+
+    <button class="btn btn-primary" id="btnBI">Analizar periodo</button>
+    <button class="btn btn-secondary" id="btnBIHoy">Hoy</button>
+    <button class="btn btn-secondary" id="btnBIMes">Este mes</button>
+    <button class="btn btn-secondary" id="btnBI30">Últimos 30 días</button>
+  </div>
+
+  <div class="bi-actions">
+    <button class="btn btn-outline" id="btnBIDescargarGraficas">Descargar gráficas PNG</button>
+    <button class="btn btn-outline" id="btnBIImprimir">Imprimir / guardar PDF</button>
+    <button class="btn btn-outline" id="btnExportarBICSV">Exportar datos CSV</button>
+  </div>
+
+  <div class="cards">
+    <div class="card">
+      <h4>Reservaciones web</h4>
+      <div class="value" id="biReservacionesWeb">0</div>
+      <small>Generadas desde la página pública</small>
+    </div>
+
+    <div class="card">
+      <h4>Ventas en taquilla</h4>
+      <div class="value" id="biVentasTaquilla">0</div>
+      <small>Registradas desde el panel</small>
+    </div>
+
+    <div class="card">
+      <h4>Pendientes de pago</h4>
+      <div class="value" id="biPendientesPago">0</div>
+      <small>Reservaciones por cobrar</small>
+    </div>
+
+    <div class="card">
+      <h4>Ingresos estimados</h4>
+      <div class="value" id="biIngresosEstimados">$0</div>
+      <small>Total esperado por boletos</small>
+    </div>
+
+    <div class="card">
+      <h4>Ingresos cobrados</h4>
+      <div class="value" id="biIngresosCobrados">$0</div>
+      <small>Pagos confirmados</small>
+    </div>
+  </div>
+
+  <div class="cards">
+    <div class="card">
+      <h4>Categoría líder</h4>
+      <div class="value" id="biCategoriaTop" style="font-size:1.15rem;">---</div>
+      <small>Boleto con mayor demanda</small>
+    </div>
+
+    <div class="card">
+      <h4>Día con más demanda</h4>
+      <div class="value" id="biDiaTop" style="font-size:1.15rem;">---</div>
+      <small>Según reservaciones/ventas</small>
+    </div>
+
+    <div class="card">
+      <h4>Conversión a pago</h4>
+      <div class="value" id="biConversionPago">0%</div>
+      <small>Pagadas vs total de operaciones</small>
+    </div>
+  </div>
+
+  <div class="insights-grid">
+    <div class="insight-card">
+      <h4>🎟️ Categoría más fuerte</h4>
+      <p id="insightCategoria">Sin datos por ahora.</p>
+    </div>
+
+    <div class="insight-card">
+      <h4>📅 Día recomendado</h4>
+      <p id="insightDia">Sin datos por ahora.</p>
+    </div>
+
+    <div class="insight-card">
+      <h4>💰 Seguimiento de pagos</h4>
+      <p id="insightPago">Sin datos por ahora.</p>
+    </div>
+  </div>
+
+  <div class="insights-grid">
+    <div class="insight-card decision">
+      <h4>🎯 Promoción sugerida</h4>
+      <p id="insightPromocion">Sin datos suficientes para sugerir promoción.</p>
+    </div>
+
+    <div class="insight-card decision">
+      <h4>🧾 Canal recomendado</h4>
+      <p id="insightCanal">Sin datos suficientes para recomendar canal.</p>
+    </div>
+
+    <div class="insight-card decision">
+      <h4>🔮 Pronóstico mensual</h4>
+      <p id="insightPronostico">Sin datos suficientes para pronosticar.</p>
+    </div>
+  </div>
+
+  <div class="chart-grid bi-chart-grid">
+    <div class="chart-card">
+      <h4>🎟️ Boletos por categoría</h4>
+      <canvas id="chartCategorias"></canvas>
+    </div>
+
+    <div class="chart-card">
+      <h4>💳 Reservaciones por estado de pago</h4>
+      <canvas id="chartEstados"></canvas>
+    </div>
+
+    <div class="chart-card">
+      <h4>🌐 Reservaciones web vs ventas en taquilla</h4>
+      <canvas id="chartCanales"></canvas>
+    </div>
+
+    <div class="chart-card">
+      <h4>💰 Ingresos estimados vs cobrados</h4>
+      <canvas id="chartIngresos"></canvas>
+    </div>
+
+    <div class="chart-card">
+      <h4>📅 Días con mayor demanda</h4>
+      <canvas id="chartDiasSemana"></canvas>
+    </div>
+
+    <div class="chart-card">
+      <h4>📉 Días con menor demanda</h4>
+      <canvas id="chartDiasBajos"></canvas>
+    </div>
+
+    <div class="chart-card large">
+      <h4>📊 Tendencia real de visitantes por fecha</h4>
+      <canvas id="chartTendencia"></canvas>
+    </div>
+
+    <div class="chart-card large">
+      <h4>🔮 Pronóstico aproximado de visitantes por mes</h4>
+      <p class="chart-help">
+        Estimación basada en el promedio de visitantes registrados y temporadas típicas en México:
+        verano, regreso a clases, puentes y vacaciones decembrinas.
+      </p>
+      <canvas id="chartPronostico"></canvas>
+    </div>
+  </div>
+
+  <div id="msgBI" class="message"></div>
+</section>
+<section class="panel" id="panel-promociones">
+  <div class="bi-hero">
+    <div>
+      <span class="module-kicker">Promociones</span>
+      <h3>🎯 Promociones web</h3>
+      <p>
+        Configura promociones para aumentar visitas en días de baja demanda.
+        Estas promociones aplican solo en reservaciones realizadas desde la página pública.
+      </p>
+    </div>
+
+    <div class="bi-status">
+      <small>Canal</small>
+      <strong>🌐 Solo web</strong>
+    </div>
+  </div>
+
+  <div class="taquilla-alert">
+    <strong>ℹ️ Regla:</strong> la promoción 2x1 se aplica únicamente a compras en línea.  
+    En taquilla se mantiene el cobro normal.
+  </div>
+
+  <div class="taquilla-layout pro">
+    <div class="taquilla-card venta-form-card">
+      <div class="section-title-row">
+        <div>
+          <h4>Nueva promoción</h4>
+          <p>Define fecha, día y categoría para aplicar el 2x1.</p>
+        </div>
+        <span class="pill-soft">2x1 web</span>
+        <input type="hidden" id="promoEditId" value="">
+      </div>
+
+      <div class="taquilla-grid">
+        <div class="field">
+          <label for="promoNombre">Nombre de la promoción</label>
+          <input type="text" id="promoNombre" placeholder="Ej. Martes 2x1 Web">
+        </div>
+
+        <div class="field">
+          <label for="promoCategoria">Categoría</label>
+          <select id="promoCategoria">
+            <option value="">Todas las categorías</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label for="promoDia">Día de aplicación</label>
+          <select id="promoDia">
+            <option value="">Todos los días</option>
+            <option value="1">Domingo</option>
+            <option value="2">Lunes</option>
+            <option value="3">Martes</option>
+            <option value="4">Miércoles</option>
+            <option value="5">Jueves</option>
+            <option value="6">Viernes</option>
+            <option value="7">Sábado</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label for="promoInicio">Fecha inicial</label>
+          <input type="date" id="promoInicio">
+        </div>
+
+        <div class="field">
+          <label for="promoFin">Fecha final</label>
+          <input type="date" id="promoFin">
+        </div>
+
+        <div class="field">
+          <label for="promoDescripcion">Descripción</label>
+          <input type="text" id="promoDescripcion" placeholder="Ej. Promoción para impulsar visitas entre semana">
+        </div>
+      </div>
+
+      <div class="taquilla-actions">
+        <button class="btn btn-primary" id="btnGuardarPromo">Guardar promoción</button>
+        <button class="btn btn-outline" id="btnLimpiarPromo">Limpiar</button>
+      </div>
+
+      <div id="msgPromos" class="message"></div>
+    </div>
+
+    <div class="taquilla-card boletos-card">
+      <div class="section-title-row">
+        <div>
+          <h4>Promociones registradas</h4>
+          <p>Activa o desactiva promociones sin borrar información.</p>
+        </div>
+      </div>
+
+      <div id="listaPromociones" class="promos-list">
+        Cargando promociones...
+      </div>
+    </div>
+  </div>
+</section>
+<section class="panel" id="panel-animales">
+  <div class="bi-hero">
+    <div>
+      <span class="module-kicker">Catálogo zoológico</span>
+      <h3>🐯 Gestión de animales</h3>
+      <p>
+        Agrega, modifica o elimina los animales que se mostrarán en la página pública del zoológico.
+      </p>
+    </div>
+
+    <div class="bi-status">
+      <small>Vista pública</small>
+      <strong>🌿 Activa</strong>
+    </div>
+  </div>
+
+  <div class="taquilla-alert">
+    <strong>ℹ️ Nota:</strong> por ahora la imagen se coloca mediante una URL.
+    También puedes usar imágenes locales guardadas en <strong>/frontend/img</strong>, por ejemplo:
+    <strong>/img/tigre.jpg</strong>.
+  </div>
+
+  <div class="taquilla-layout pro">
+    <div class="taquilla-card venta-form-card">
+      <div class="section-title-row">
+        <div>
+          <h4 id="animalFormTitle">Nuevo animal</h4>
+          <p>Registra la información que verá el visitante.</p>
+        </div>
+
+        <span class="pill-soft">Público web</span>
+        <input type="hidden" id="animalEditId" value="">
+      </div>
+
+      <div class="taquilla-grid">
+        <div class="field">
+          <label for="animalNombre">Nombre del animal</label>
+          <input type="text" id="animalNombre" placeholder="Ej. Tigre de Bengala">
+        </div>
+
+        <div class="field">
+          <label for="animalEspecie">Especie</label>
+          <input type="text" id="animalEspecie" placeholder="Ej. Panthera tigris">
+        </div>
+
+        <div class="field">
+          <label for="animalHabitat">Hábitat</label>
+          <input type="text" id="animalHabitat" placeholder="Ej. Selvas y bosques tropicales">
+        </div>
+
+        <div class="field">
+          <label for="animalAlimentacion">Alimentación</label>
+          <input type="text" id="animalAlimentacion" placeholder="Ej. Carnívoro">
+        </div>
+
+        <div class="field">
+          <label for="animalImagen">URL de imagen</label>
+          <input type="text" id="animalImagen" placeholder="Ej. /img/tigre.jpg o https://...">
+        </div>
+
+        <div class="field">
+          <label for="animalOrden">Orden</label>
+          <input type="number" id="animalOrden" value="0" min="0">
+        </div>
+
+        <div class="field field-full">
+          <label for="animalDescripcion">Descripción</label>
+          <textarea id="animalDescripcion" rows="4" placeholder="Describe al animal de forma breve y atractiva para los visitantes."></textarea>
+        </div>
+      </div>
+
+      <div class="animal-preview" id="animalPreview">
+        <img src="" alt="Vista previa del animal" id="animalPreviewImg">
+        <div>
+          <strong>Vista previa</strong>
+          <p>La imagen aparecerá aquí cuando escribas la URL.</p>
+        </div>
+      </div>
+
+      <div class="taquilla-actions">
+        <button class="btn btn-primary" id="btnGuardarAnimal">Guardar animal</button>
+        <button class="btn btn-outline" id="btnLimpiarAnimal">Limpiar</button>
+      </div>
+
+      <div id="msgAnimales" class="message"></div>
+    </div>
+
+    <div class="taquilla-card boletos-card">
+      <div class="section-title-row">
+        <div>
+          <h4>Animales registrados</h4>
+          <p>Estos son los animales que pueden mostrarse al público.</p>
+        </div>
+      </div>
+
+      <div id="listaAnimalesAdmin" class="animales-admin-list">
+        Cargando animales...
+      </div>
+    </div>
+  </div>
+</section>
+    </main>
+  </div>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="/js/admin.js"></script> 
+</body>
+</html>

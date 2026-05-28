@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🦁 Zoológico El Sabinal - Sistema de Boletos</title>
+    <link rel="stylesheet" href="/css/index.css">
+</head>
+<body>
+    <div class="container">
+
+        <!-- ENCABEZADO -->
+        <div class="zoo-header">
+            <h1>🦁 ZOOLÓGICO EL SABINAL</h1>
+            <p>La Trinitaria, Chiapas — 🌿 Naturaleza y diversión para toda la familia</p>
+
+            <div class="zoo-info">
+                <div class="info-item">📍 El Sabinal, La Trinitaria</div>
+                <div class="info-item">🕐 Lun-Dom: 9:00 AM - 5:00 PM</div>
+                <div class="info-item">📞 963 331 5111</div>
+            </div>
+<div class="public-actions">
+    <a href="/animales.html" class="btn-ver-animales">
+        🐯 Ver animales del zoológico
+    </a>
+</div>
+            <!-- PROMOCIÓN WEB -->
+            <div id="promo-web-box" class="promo-web-box" style="display:none;"></div>
+        </div>
+
+        <!-- TARIFAS -->
+        <div class="tarifas">
+            <h2>🎟️ Tarifas disponibles</h2>
+            <div class="tarjetas-precios" id="tarjetas-precios"></div>
+        </div>
+
+        <!-- FORMULARIO DE RESERVACIÓN -->
+        <div class="compra-form">
+            <h2>🎫 Reservar Boletos en Línea</h2>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label>👤 Nombre del comprador</label>
+                    <input type="text" id="nombre_cliente" placeholder="Nombre completo" required>
+                </div>
+
+                <div class="form-group">
+                    <label>📧 Correo Electrónico</label>
+                    <input type="email" id="email" placeholder="tucorreo@ejemplo.com" required>
+                </div>
+
+                <div class="form-group">
+                    <label>📱 Teléfono</label>
+                    <input
+                        type="tel"
+                        id="telefono"
+                        placeholder="9633315111"
+                        maxlength="10"
+                        inputmode="numeric"
+                        pattern="[0-9]{10}"
+                        required
+                    >
+                </div>
+
+                <div class="form-group">
+                    <label>📅 Fecha de visita</label>
+                    <input type="date" id="fecha_visita" required>
+                </div>
+            </div>
+
+            <div class="boletos-section">
+                <h3>🎟️ Selecciona tus boletos</h3>
+
+                <div class="boletos-dinamicos" id="boletos-container"></div>
+
+                <div class="acciones-boletos">
+                    <button type="button" class="btn-agregar" onclick="agregarBoleto()">
+                        ➕ Agregar otro boleto
+                    </button>
+                </div>
+
+                <div class="total total-resumen" id="total">
+                    <div>
+                        <span>Subtotal estimado</span>
+                        <strong>$0.00 MXN</strong>
+                    </div>
+
+                    <div>
+                        <span>Descuento web</span>
+                        <strong>$0.00 MXN</strong>
+                    </div>
+
+                    <div class="total-final">
+                        <span>Total final</span>
+                        <strong>$0.00 MXN</strong>
+                    </div>
+                </div>
+            </div>
+
+            <button type="button" class="btn-comprar" id="btn-comprar" onclick="procesarCompra()">
+                🎟️ Reservar Boletos y Generar QR
+            </button>
+
+            <div id="mensaje" class="mensaje"></div>
+        </div>
+
+        <!-- CONSULTAR BOLETO -->
+        <div class="consulta-box">
+            <h2>🔎 Consultar mi boleto</h2>
+
+            <div class="consulta-row">
+                <div class="form-group">
+                    <label>🎫 Folio de compra</label>
+                    <input type="text" id="folio_consulta" placeholder="Ej. ZB-20260406-XXXXXX">
+                </div>
+
+                <button type="button" class="btn-comprar" style="max-width:260px;" onclick="consultarBoleto()">
+                    Buscar boleto
+                </button>
+            </div>
+
+            <div class="consulta-row">
+                <div class="form-group">
+                    <label>📧 Correo electrónico</label>
+                    <input type="email" id="email_consulta" placeholder="Ej. tucorreo@gmail.com">
+                </div>
+
+                <button type="button" class="btn-comprar" style="max-width:260px;" onclick="consultarBoletosPorEmail()">
+                    Buscar por correo
+                </button>
+            </div>
+
+            <div id="mensaje-consulta" class="mensaje"></div>
+
+            <div id="lista-boletos-email" class="lista-boletos-email" style="display:none;"></div>
+
+            <div id="consulta-resultado" class="consulta-resultado">
+                <h2>📋 Resultado de la consulta</h2>
+
+                <div id="consulta-qr" class="qr-code"></div>
+
+                <div class="resumen-compra" id="consulta-resumen"></div>
+
+                <a id="consulta-descargar" class="btn-descargar" href="#" download target="_blank">
+                    ⬇️ Descargar QR
+                </a>
+
+                <button class="btn-imprimir" onclick="imprimirConsulta()">
+                    🖨️ Imprimir boleto
+                </button>
+            </div>
+        </div>
+
+        <!-- MODAL DE QR GENERADO -->
+        <div id="qr-generado" class="qr-container">
+            <div class="qr-modal">
+                <button type="button" class="modal-close" onclick="cerrarComprobanteQR()">✕</button>
+
+                <div class="qr-modal-header">
+                    <h2>✅ ¡Reservación registrada!</h2>
+                    <p>Tu código QR fue generado correctamente. Preséntalo en taquilla para confirmar tu pago.</p>
+                </div>
+
+                <div id="qr-code" class="qr-code"></div>
+
+                <div class="resumen-compra" id="resumen-compra"></div>
+
+                <div class="qr-actions">
+                    <a id="btn-descargar" class="btn-descargar" href="#" download target="_blank">
+                        ⬇️ Descargar QR
+                    </a>
+
+                    <button class="btn-imprimir" onclick="imprimirSoloQR()">
+                        🖨️ Imprimir comprobante
+                    </button>
+
+                    <button class="btn-nueva-reserva" onclick="nuevaReservacion()">
+                        ➕ Nueva reservación
+                    </button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script src="/js/index.js"></script>
+</body>
+</html>
