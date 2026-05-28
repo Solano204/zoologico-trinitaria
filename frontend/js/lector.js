@@ -1,4 +1,5 @@
-       const API_BASE = 'https://zoologico-trinitaria-production.up.railway.app';
+const API_BASE = 'https://zoologico-trinitaria-production.up.railway.app';
+const PANEL_LOGIN_URL = 'https://zoologico-trinitaria-production.up.railway.app/panel-login';
       let html5QrCode = null;
 let camaraActiva = false;
 let procesandoEscaneo = false;
@@ -54,32 +55,34 @@ let reservaPendientePago = null;
             const valor = document.getElementById('taquilleroId').value.trim();
             return valor ? Number(valor) : null;
         }
-        async function verificarSesionPanel() {
+   
+async function verificarSesionPanel() {
     try {
         const res = await fetch(`${API_BASE}/api/panel-me`, {
             credentials: 'include'
         });
 
         if (!res.ok) {
-            window.location.href = '/panel-login?next=' + encodeURIComponent('/lector.html');
+            window.location.href = `${PANEL_LOGIN_URL}?next=${encodeURIComponent(window.location.href)}`;
             return false;
         }
 
         const data = await res.json();
 
-     if (!data.success) {
-    window.location.href = '/panel-login?next=' + encodeURIComponent('/lector.html');
-    return false;
-}
+        if (!data.success) {
+            window.location.href = `${PANEL_LOGIN_URL}?next=${encodeURIComponent(window.location.href)}`;
+            return false;
+        }
 
-mostrarUsuarioLector(data.user?.username || 'admin');
-return true;
+        const usernameEl = document.getElementById('lectorUsername');
+        if (usernameEl) usernameEl.textContent = data.user?.username || 'admin';
+
+        return true;
     } catch (error) {
-        window.location.href = '/panel-login?next=' + encodeURIComponent('/lector.html');
+        window.location.href = `${PANEL_LOGIN_URL}?next=${encodeURIComponent(window.location.href)}`;
         return false;
     }
 }
-
         function setResultado(texto, tipo = '') {
             const resultadoDiv = document.getElementById('resultado');
             resultadoDiv.className = 'resultado';
