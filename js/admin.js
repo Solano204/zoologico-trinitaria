@@ -1,5 +1,5 @@
 
-const API_BASE = '';
+const API_BASE = 'https://zoologico-trinitaria-production.up.railway.app';
 let ventaActual = null;
 let categoriasTaquilla = [];
 let ventaTaquillaActual = null;
