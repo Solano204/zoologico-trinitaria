@@ -47,7 +47,7 @@ const panelSessions = new Map();
 // ============================================
 // ⚙️ CONFIG GENERAL
 // ============================================
-const FRONTEND_DIR = path.join(__dirname, '../frontend'); // ajusta si cambia tu estructura
+const FRONTEND_DIR = path.join(__dirname, ''); // ajusta si cambia tu estructura
 const QR_DIR = path.join(__dirname, 'qrs');
 
 if (!fs.existsSync(QR_DIR)) {
@@ -100,10 +100,22 @@ app.use((req, res, next) => {
     next();
 });
 
-if (fs.existsSync(FRONTEND_DIR)) {
-    app.use(express.static(FRONTEND_DIR));
-    console.log('🌐 Frontend servido desde:', FRONTEND_DIR);
-}
+app.get('/admin.html', (req, res) => {
+    res.redirect(`${VERCEL_BASE}/admin.html`);
+});
+
+app.get('/lector.html', (req, res) => {
+    res.redirect(`${VERCEL_BASE}/lector.html`);
+});
+
+app.get('/index.html', (req, res) => {
+    res.redirect(`${VERCEL_BASE}/index.html`);
+});
+
+app.get('/', (req, res) => {
+    res.redirect(`${VERCEL_BASE}/`);
+});
+
 // ============================================
 // 🗄️ CONEXIÓN A MySQL
 // ============================================
