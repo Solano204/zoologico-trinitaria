@@ -1,5 +1,4 @@
-
-const API_BASE = 'https://zoologico-trinitaria-production.up.railway.app';
+const PANEL_LOGIN_URL = 'https://zoologico-trinitaria-production.up.railway.app/panel-login';
 let ventaActual = null;
 let categoriasTaquilla = [];
 let ventaTaquillaActual = null;
@@ -2378,31 +2377,34 @@ async function eliminarAnimal(id) {
     setMessage('msgAnimales', '❌ ' + error.message, 'error');
   }
 }
+
+
 async function verificarSesionPanel() {
-  try {
-    const res = await fetch(`${API_BASE}/api/panel-me`, {
-      credentials: 'include'
-    });
+    try {
+        const res = await fetch(`${API_BASE}/api/panel-me`, {
+            credentials: 'include'
+        });
 
-    if (!res.ok) {
-      window.location.href = '/panel-login?next=' + encodeURIComponent('/admin.html');
-      return false;
+        if (!res.ok) {
+            window.location.href = `${PANEL_LOGIN_URL}?next=${encodeURIComponent(window.location.href)}`;
+            return false;
+        }
+
+        const data = await res.json();
+
+        if (!data.success) {
+            window.location.href = `${PANEL_LOGIN_URL}?next=${encodeURIComponent(window.location.href)}`;
+            return false;
+        }
+
+        mostrarUsuarioPanel(data.user?.username || 'admin');
+        return true;
+    } catch (error) {
+        window.location.href = `${PANEL_LOGIN_URL}?next=${encodeURIComponent(window.location.href)}`;
+        return false;
     }
-
-    const data = await res.json();
-if (!data.success) {
-  window.location.href = '/panel-login?next=' + encodeURIComponent('/admin.html');
-  return false;
 }
 
-mostrarUsuarioPanel(data.user?.username || 'admin');
-return true;
-    return true;
-  } catch (error) {
-    window.location.href = '/panel-login?next=' + encodeURIComponent('/admin.html');
-    return false;
-  }
-}
 
     document.querySelectorAll('.menu-btn').forEach(btn => {
       btn.addEventListener('click', () => {
