@@ -1,3 +1,4 @@
+const API_BASE = 'https://zoologico-trinitaria-production.up.railway.app';
 const PANEL_LOGIN_URL = 'https://zoologico-trinitaria-production.up.railway.app/panel-login';
 let ventaActual = null;
 let categoriasTaquilla = [];
