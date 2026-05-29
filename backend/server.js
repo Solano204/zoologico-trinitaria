@@ -7,13 +7,16 @@ require('dotenv').config();
 const dns = require('dns');
 dns.setDefaultResultOrder('ipv4first');
 
+const express = require('express');
+const cors = require('cors');
+const mysql = require('mysql2/promise');
+
+
+
 // ============================================
 // 📦 IMPORTACIONES
 // ============================================
-const express = require('express');
-const mysql = require('mysql2/promise');
 const QRCode = require('qrcode');
-const cors = require('cors');
 const nodemailer = require('nodemailer');
 const fs = require('fs');
 const path = require('path');
@@ -56,16 +59,15 @@ if (!fs.existsSync(QR_DIR)) {
 }
 
 app.use(cors({
-    origin: [
-        "*",
-        'https://zoologico-trinitaria-o7psz689z-solano204s-projects.vercel.app',
-        "http://zoologico-trinitaria-90x6jsk9i-solano204s-projects.vercel.app/",
-        'http://localhost:3000',
-        'http://localhost:5500',
-        '/**'
-    ],
-    credentials: true
+    origin: '*',  // Allow all origins
+    credentials: false,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization']
 }));
+// ✅ Preflight handler
+app.options('*', cors());
+
+// ✅ Body parsers NEXT
 app.use(express.json({ limit: '2mb' }));
 app.use(express.urlencoded({ extended: true }));
 
@@ -75,6 +77,7 @@ function aplicarNoCache(res) {
     res.setHeader('Expires', '0');
     res.setHeader('Surrogate-Control', 'no-store');
 }
+
 
 app.use((req, res, next) => {
     const rutasNoCache = [
