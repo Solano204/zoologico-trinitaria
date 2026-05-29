@@ -34,6 +34,12 @@ async function apiFetch(url, options = {}) {
     return res;
 }
 
+function cerrarSesion() {
+    // Always redirect to Railway for logout — never Vercel
+    window.location.href = 'https://zoologico-trinitaria-production.up.railway.app/panel-logout';
+}
+
+
 function mostrarUsuarioPanel(username) {
   const box = document.getElementById('panelUsername');
   if (box) {
