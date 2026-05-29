@@ -563,13 +563,10 @@ app.post('/panel-login', (req, res) => {
 
 app.get('/panel-logout', (req, res) => {
     aplicarNoCache(res);
-    const cookies = parseCookies(req);
-    const token = cookies.panel_session;
-    if (token) panelSessions.delete(token);
     res.setHeader('Set-Cookie', `panel_session=; HttpOnly; SameSite=None; Secure; Path=/; Max-Age=0`);
     res.setHeader('Clear-Site-Data', '"cache"');
-  return res.redirect('https://zoologico-trinitaria-production.up.railway.app/panel-login?logout=1');
-
+    // FIX: full URL so browser goes to Railway, not Vercel
+    return res.redirect('https://zoologico-trinitaria-production.up.railway.app/panel-login?logout=1');
 });
 
 app.get('/api/panel-me', requirePanelAuth, (req, res) => {
