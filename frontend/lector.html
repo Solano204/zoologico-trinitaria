@@ -8,20 +8,19 @@
 </head>
 <body>
     <div class="lector-container">
-  <div class="top-actions">
-   
-<!-- AFTER -->
-<a href="https://zoologico-trinitaria-o7psz689z-solano204s-projects.vercel.app/admin.html" class="link-btn link-admin">📊 Volver al panel</a>
-<a href="javascript:void(0)" onclick="cerrarSesion()" class="link-btn link-logout">🚪 Cerrar sesión</a>
-</div>
+        <div class="top-actions">
+            <!-- Uses JS to build the admin URL dynamically so it works on any Vercel preview -->
+            <a href="javascript:void(0)" onclick="irAlPanel()" class="link-btn link-admin">📊 Volver al panel</a>
+            <a href="javascript:void(0)" onclick="cerrarSesion()" class="link-btn link-logout">🚪 Cerrar sesión</a>
+        </div>
 
-<div class="session-box">
-    <small><span class="dot"></span>Sesión activa</small>
-    <strong id="lectorUsername">Cargando usuario...</strong>
-</div>
+        <div class="session-box">
+            <small><span class="dot"></span>Sesión activa</small>
+            <strong id="lectorUsername">Cargando usuario...</strong>
+        </div>
 
-<h1>🔍 Lector IoT - Zoológico El Sabinal</h1>
-    <p class="subtitulo">Escanea el QR de la compra o captura el folio manualmente</p>
+        <h1>🔍 Lector IoT - Zoológico El Sabinal</h1>
+        <p class="subtitulo">Escanea el QR de la compra o captura el folio manualmente</p>
 
         <div class="controles-top">
             <div class="campo">
@@ -50,31 +49,29 @@
             <button class="btn btn-secundario" style="flex: 0 0 170px;" onclick="procesarManual()">Validar</button>
         </div>
 
-<div id="resultado" class="resultado">
-    Esperando código QR...
-</div>
+        <div id="resultado" class="resultado">
+            Esperando código QR...
+        </div>
 
-<div id="debugCodigo" style="margin-top:10px; padding:12px; border-radius:10px; background:#f8f9fa; border:1px solid #ccc; font-family:monospace; font-size:0.95em;">
-    Código leído: ---
-</div>
-<div id="accionesPago" class="acciones-pago">
-    <h3>💵 Reservación pendiente de pago</h3>
-    <p id="accionesPagoTexto">El cliente debe pagar en taquilla.</p>
+        <div id="debugCodigo" style="margin-top:10px; padding:12px; border-radius:10px; background:#f8f9fa; border:1px solid #ccc; font-family:monospace; font-size:0.95em;">
+            Código leído: ---
+        </div>
 
-    <div class="pago-actions">
-        <button class="btn btn-pago-ok" type="button" onclick="confirmarPagoDesdeLector()">
-            ✅ Confirmar pago y permitir acceso
-        </button>
-
-        <button class="btn btn-pago-cancelar" type="button" onclick="cancelarPagoDesdeLector()">
-            ❌ No pagó / cancelar intento
-        </button>
-    </div>
-</div>
+        <div id="accionesPago" class="acciones-pago">
+            <h3>💵 Reservación pendiente de pago</h3>
+            <p id="accionesPagoTexto">El cliente debe pagar en taquilla.</p>
+            <div class="pago-actions">
+                <button class="btn btn-pago-ok" type="button" onclick="confirmarPagoDesdeLector()">
+                    ✅ Confirmar pago y permitir acceso
+                </button>
+                <button class="btn btn-pago-cancelar" type="button" onclick="cancelarPagoDesdeLector()">
+                    ❌ No pagó / cancelar intento
+                </button>
+            </div>
+        </div>
 
         <div id="info-boleto" class="info-boleto">
             <h3>📋 Detalles del acceso</h3>
-
             <div class="info-grid">
                 <p><strong>Folio:</strong> <span id="folio">-</span></p>
                 <p><strong>Cliente:</strong> <span id="nombreCliente">-</span></p>
@@ -83,11 +80,10 @@
                 <p><strong>Fecha visita:</strong> <span id="fechaVisita">-</span></p>
                 <p><strong>Método de pago:</strong> <span id="metodoPago">-</span></p>
                 <p><strong>Total personas:</strong> <span id="cantidadPersonas">-</span></p>
-               <p><strong>Total:</strong> <span id="total">-</span></p>
+                <p><strong>Total:</strong> <span id="total">-</span></p>
                 <p><strong>Fecha acceso:</strong> <span id="fechaAcceso">-</span></p>
                 <p><strong>Estado:</strong> <span id="estadoAcceso">-</span></p>
             </div>
-
             <div class="detalle-box">
                 <h4>🎟️ Detalle de la compra</h4>
                 <ul id="listaDetalles">
@@ -108,7 +104,12 @@
     </div>
 
     <script src="https://unpkg.com/html5-qrcode"></script>
-    
-<script src="js/lector.js"></script> 
+    <script src="js/lector.js"></script>
+    <script>
+        // Build admin.html URL from current origin so it works on any Vercel preview
+        function irAlPanel() {
+            window.location.href = window.location.origin + '/admin.html';
+        }
+    </script>
 </body>
 </html>
