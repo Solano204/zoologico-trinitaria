@@ -57,6 +57,7 @@ if (!fs.existsSync(QR_DIR)) {
 
 app.use(cors({
     origin: [
+        "*",
         'https://zoologico-trinitaria-o7psz689z-solano204s-projects.vercel.app',
         "http://zoologico-trinitaria-90x6jsk9i-solano204s-projects.vercel.app/",
         'http://localhost:3000',
