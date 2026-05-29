@@ -95,15 +95,6 @@ app.use((req, res, next) => {
 
 app.use('/qrs', express.static(QR_DIR));
 
-app.use((req, res, next) => {
-    const protegidas = ['/admin.html', '/lector.html'];
-
-    if (protegidas.includes(req.path)) {
-        return requirePanelAuth(req, res, next);
-    }
-
-    next();
-});
 
 app.get('/admin.html', (req, res) => {
     res.redirect(`${VERCEL_BASE}/admin.html`);
@@ -1022,13 +1013,19 @@ function escapeHtml(valor) {
 }
 
 function sanitizarNextUrl(valor) {
-    const nextUrl = String(valor || '/admin.html');
+    const nextUrl = String(valor || `${VERCEL_BASE}/admin.html`);
 
-    if (!nextUrl.startsWith('/') || nextUrl.startsWith('//')) {
-        return '/admin.html';
+    // Allow full Vercel URL
+    if (nextUrl.startsWith(VERCEL_BASE)) {
+        return nextUrl;
     }
 
-    return nextUrl;
+    // Allow relative paths
+    if (nextUrl.startsWith('/') && !nextUrl.startsWith('//')) {
+        return nextUrl;
+    }
+
+    return `${VERCEL_BASE}/admin.html`;
 }
 
 app.get('/panel-login', (req, res) => {
@@ -1359,34 +1356,12 @@ app.get('/panel-login', (req, res) => {
         </html>
     `);
 });
-
 app.post('/panel-login', (req, res) => {
     aplicarNoCache(res);
 
     const username = String(req.body.username || '').trim();
     const password = String(req.body.password || '');
-    const nextUrl = sanitizarNextUrl(req.body.next || '/admin.html');
-
-    if (username !== PANEL_USER || password !== PANEL_PASS) {
-        return res.redirect(`/panel-login?error=1&next=${encodeURIComponent(nextUrl)}`);
-    }
-
-    const session = crearPanelSession(username);
-    const cookieSecure = process.env.NODE_ENV === 'production' ? '; Secure' : '';
-
-  res.setHeader(
-  'Set-Cookie',
-  `panel_session=${session.token}; HttpOnly; SameSite=None; Secure; Path=/; Max-Age=${PANEL_SESSION_HOURS * 60 * 60}`
-);
-    return res.redirect(nextUrl);
-});
-
-app.post('/panel-login', (req, res) => {
-    aplicarNoCache(res);
-
-    const username = String(req.body.username || '').trim();
-    const password = String(req.body.password || '');
-    const nextUrl = sanitizarNextUrl(req.body.next || '/admin.html');
+    const nextUrl = sanitizarNextUrl(req.body.next || `${VERCEL_BASE}/admin.html`);
 
     if (username !== PANEL_USER || password !== PANEL_PASS) {
         return res.redirect(`/panel-login?error=1&next=${encodeURIComponent(nextUrl)}`);
@@ -1399,13 +1374,8 @@ app.post('/panel-login', (req, res) => {
         `panel_session=${session.token}; HttpOnly; SameSite=None; Secure; Path=/; Max-Age=${PANEL_SESSION_HOURS * 60 * 60}`
     );
 
-    // Si nextUrl es una URL completa (http/https), redirige directo
-    // Si es una ruta relativa como /admin.html, la prepende con Vercel
-    const redirectTo = nextUrl.startsWith('http')
-        ? nextUrl
-        : `${VERCEL_BASE}${nextUrl}`;
-
-    return res.redirect(redirectTo);
+    // nextUrl is already a full URL (from VERCEL_BASE), redirect directly
+    return res.redirect(nextUrl);
 });
 
 app.get('/panel-logout', (req, res) => {
