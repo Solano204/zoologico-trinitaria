@@ -60,9 +60,21 @@ if (!fs.existsSync(QR_DIR)) {
 
 // 1. REPLACE the cors config
 app.use(cors({
-    origin: [
-        'https://zoologico-trinitaria-o7psz689z-solano204s-projects.vercel.app'
-    ],
+    origin: function(origin, callback) {
+        // Allow requests with no origin (mobile apps, Postman, curl)
+        if (!origin) return callback(null, true);
+        
+        // Allow any Vercel deployment of your project
+        if (
+            origin.endsWith('.vercel.app') ||
+            origin === 'https://zoologico-trinitaria-production.up.railway.app'
+        ) {
+            return callback(null, true);
+        }
+        
+        // Block everything else
+        return callback(new Error('Not allowed by CORS'));
+    },
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization']
@@ -1019,12 +1031,14 @@ function escapeHtml(valor) {
 function sanitizarNextUrl(valor) {
     const nextUrl = String(valor || `${VERCEL_BASE}/admin.html`);
 
-    if (nextUrl.startsWith(VERCEL_BASE)) {
+    // Allow any vercel.app URL
+    if (nextUrl.startsWith('https://') && nextUrl.includes('.vercel.app')) {
         return nextUrl;
     }
 
+    // Allow relative paths
     if (nextUrl.startsWith('/') && !nextUrl.startsWith('//')) {
-        return `${VERCEL_BASE}${nextUrl}`;
+        return nextUrl;
     }
 
     return `${VERCEL_BASE}/admin.html`;
