@@ -2378,7 +2378,6 @@ async function eliminarAnimal(id) {
   }
 }
 
-
 async function verificarSesionPanel() {
     try {
         const res = await fetch(`${API_BASE}/api/panel-me`, {
@@ -2386,6 +2385,7 @@ async function verificarSesionPanel() {
         });
 
         if (!res.ok) {
+            // ✅ Redirect to RAILWAY login, not Vercel
             window.location.href = `${PANEL_LOGIN_URL}?next=${encodeURIComponent(window.location.href)}`;
             return false;
         }

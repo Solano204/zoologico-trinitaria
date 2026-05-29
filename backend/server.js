@@ -58,9 +58,12 @@ if (!fs.existsSync(QR_DIR)) {
     console.log('📁 Carpeta de QRs creada');
 }
 
+// 1. REPLACE the cors config
 app.use(cors({
-    origin: '*',
-    credentials: false,
+    origin: [
+        'https://zoologico-trinitaria-o7psz689z-solano204s-projects.vercel.app'
+    ],
+    credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization']
 }));
@@ -1012,22 +1015,20 @@ function escapeHtml(valor) {
         .replace(/'/g, '&#039;');
 }
 
+// 2. REPLACE sanitizarNextUrl
 function sanitizarNextUrl(valor) {
     const nextUrl = String(valor || `${VERCEL_BASE}/admin.html`);
 
-    // Allow full Vercel URL
     if (nextUrl.startsWith(VERCEL_BASE)) {
         return nextUrl;
     }
 
-    // Allow relative paths
     if (nextUrl.startsWith('/') && !nextUrl.startsWith('//')) {
-        return nextUrl;
+        return `${VERCEL_BASE}${nextUrl}`;
     }
 
     return `${VERCEL_BASE}/admin.html`;
 }
-
 app.get('/panel-login', (req, res) => {
     aplicarNoCache(res);
 
