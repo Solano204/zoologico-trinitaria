@@ -37,7 +37,7 @@ const DB_CONFIG = {
   queueLimit: 0,
   dateStrings: true
 };
-
+const PANEL_SECRET = cleanEnv('PANEL_SECRET') || 'sabinal-secret-2026-change-me';
 const PANEL_USER = cleanEnv('PANEL_USER') || 'admin';
 const PANEL_PASS = cleanEnv('PANEL_PASS') || 'Sabinal2026*';
 const PANEL_SESSION_HOURS = Number(cleanEnv('PANEL_SESSION_HOURS') || 12);
@@ -248,27 +248,48 @@ function parseCookies(req) {
 }
 
 function crearPanelSession(username) {
-    const token = crypto.randomBytes(32).toString('hex');
-    const expiresAt = Date.now() + (PANEL_SESSION_HOURS * 60 * 60 * 1000);
-    panelSessions.set(token, { username, expiresAt });
-    return { token, expiresAt };
+    const payload = {
+        username,
+        exp: Math.floor(Date.now() / 1000) + (PANEL_SESSION_HOURS * 3600)
+    };
+    const data = Buffer.from(JSON.stringify(payload)).toString('base64url');
+    const sig = require('crypto')
+        .createHmac('sha256', PANEL_SECRET)
+        .update(data)
+        .digest('base64url');
+    const token = `${data}.${sig}`;
+    return { token, expiresAt: payload.exp * 1000 };
 }
 
 function obtenerPanelSession(req) {
     const cookies = parseCookies(req);
     const token = cookies.panel_session;
     if (!token) return null;
-    const session = panelSessions.get(token);
-    if (!session) return null;
-    if (Date.now() > session.expiresAt) { panelSessions.delete(token); return null; }
-    return { token, ...session };
+
+    const parts = token.split('.');
+    if (parts.length !== 2) return null;
+
+    const [data, sig] = parts;
+    const expectedSig = require('crypto')
+        .createHmac('sha256', PANEL_SECRET)
+        .update(data)
+        .digest('base64url');
+
+    if (sig !== expectedSig) return null;
+
+    try {
+        const payload = JSON.parse(Buffer.from(data, 'base64url').toString());
+        if (Date.now() / 1000 > payload.exp) return null;
+        return { token, username: payload.username, expiresAt: payload.exp * 1000 };
+    } catch {
+        return null;
+    }
 }
 
+// REPLACE limpiarSesionesExpiradas (no longer needed, keep as no-op)
 function limpiarSesionesExpiradas() {
-    const ahora = Date.now();
-    for (const [token, session] of panelSessions.entries()) {
-        if (ahora > session.expiresAt) panelSessions.delete(token);
-    }
+    // Sessions are stateless JWTs — nothing to clean up
+
 }
 setInterval(limpiarSesionesExpiradas, 10 * 60 * 1000);
 
@@ -547,7 +568,8 @@ app.get('/panel-logout', (req, res) => {
     if (token) panelSessions.delete(token);
     res.setHeader('Set-Cookie', `panel_session=; HttpOnly; SameSite=None; Secure; Path=/; Max-Age=0`);
     res.setHeader('Clear-Site-Data', '"cache"');
-    return res.redirect('/panel-login?logout=1');
+  return res.redirect('https://zoologico-trinitaria-production.up.railway.app/panel-login?logout=1');
+
 });
 
 app.get('/api/panel-me', requirePanelAuth, (req, res) => {
