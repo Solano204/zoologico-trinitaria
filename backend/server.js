@@ -59,13 +59,12 @@ if (!fs.existsSync(QR_DIR)) {
 }
 
 app.use(cors({
-    origin: '*',  // Allow all origins
+    origin: '*',
     credentials: false,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization']
 }));
 // ✅ Preflight handler
-app.options('*', cors());
 
 // ✅ Body parsers NEXT
 app.use(express.json({ limit: '2mb' }));
